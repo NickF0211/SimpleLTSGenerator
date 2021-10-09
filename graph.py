@@ -4,7 +4,8 @@ from random import randint
 
 
 class Graph():
-    def __init__(self, b_depth, b_edges):
+    def __init__(self, b_depth, b_edges, id=-1):
+        self.id = id
         self.depth = 0
         self.nodes = [Node(self, 0, 0)]
         self.b_depth =b_depth

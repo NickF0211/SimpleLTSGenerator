@@ -1,3 +1,4 @@
+import random
 
 from numpy import prod
 from numpy.random import binomial
@@ -17,6 +18,76 @@ class ActionPool():
 
     def shared_action(self):
         return binomial(1, self.shared_ratio)
+
+
+    def label_ring(self, graph, ring_size):
+        bound = graph.depth
+        id = graph.id
+        forward   = id + 1
+        if forward >= ring_size:
+            forward = 0
+        backward = id - 1
+
+        if backward < 0:
+            backward = ring_size-1
+
+        self._ring_label(graph, graph.nodes[0],  0, bound, forward, backward, 0 ,0)
+
+
+
+    def forward_or_backward(self, forward_shared, backward_shared):
+        if forward_shared == self.b_shared:
+            forward_chance = False
+        else:
+            forward_chance = self.shared_action()
+        if backward_shared == self.b_shared:
+            backward_chance = False
+        else:
+            backward_chance = self.shared_action()
+
+        if forward_shared >= backward_shared:
+            if forward_chance:
+                return 1
+            elif backward_chance:
+                return 2
+            else:
+                return 0
+        else:
+            if backward_chance:
+                return 2
+            elif forward_chance:
+                return 1
+            else:
+                return 0
+
+
+
+
+
+    def _ring_label(self, graph, node, cur_depth, max_depth, forward_id, backward_id, forward_shared, backward_shared):
+        assert(cur_depth <= max_depth)
+        for out in node.out_going:
+            action_name = randint(0, self.b_name)
+            vars = [randint(0, b_var) for b_var in self.b_args]
+            time = randint(0, self.b_time)
+            result = self.forward_or_backward(forward_shared, backward_shared)
+            if result == 1:
+                shared_id = forward_shared
+                out.add_label(ProcessWishSharedLabels(shared_id, graph.id, forward_id))
+                new_forward_shared_shared = forward_shared + 1
+                new_backward_shared = backward_shared
+            elif result == 2:
+                shared_id = backward_shared
+                out.add_label(ProcessWishSharedLabels(shared_id, backward_id, graph.id))
+                new_forward_shared_shared = forward_shared
+                new_backward_shared = backward_shared+ 1
+            else:
+                out.add_label(Label(action_name, vars, time))
+                new_forward_shared_shared = forward_shared
+                new_backward_shared = backward_shared
+            dest_node = graph.get_node(out.dest)
+            self._ring_label(graph, dest_node, cur_depth+1, max_depth, forward_id, backward_id, new_forward_shared_shared, new_backward_shared )
+
 
     def label(self, graph):
         #DFS on the graph, assume time transition is monotonic
@@ -76,3 +147,6 @@ class SharedLabel(Label):
         super().__init__("SHARED", [id], 0)
 
 
+class ProcessWishSharedLabels(Label):
+    def __init__(self, id, pa, pb):
+        super().__init__("SHARED_{}_{}".format(pa, pb), [id], 0)
