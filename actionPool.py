@@ -72,5 +72,7 @@ class Label():
 
 class SharedLabel(Label):
 
-    def __init__(self, id, time):
-        super().__init__("SHARED", [id], time)
+    def __init__(self, id):
+        super().__init__("SHARED", [id], 0)
+
+
