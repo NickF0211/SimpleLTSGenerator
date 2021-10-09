@@ -1,6 +1,7 @@
 from actionPool import *
 from graph import *
 from svl_template import generate_svl, generate_svl_ring
+from condition_grammar import Condition_Generator, pretty_print
 import os
 
 def generate_single_LTS(target_name, b_action, b_var, b_time, b_shared, b_depth, b_shared_ratio = -1):
@@ -15,6 +16,7 @@ def generate_LTS(target_directory, N, b_action, b_var, b_time, b_shared, b_depth
     if not os.path.isdir(target_directory):
         os.mkdir(target_directory)
     ap = ActionPool(b_action, b_var, b_time, b_shared, b_shared_ratio= b_shared_ratio)
+
     for i in range(N):
         target_file = os.path.join(os.getcwd(), target_directory, "graph_{}.aut".format(i))
         graph = Graph(b_depth, ap.ap_size, id=i)
@@ -30,4 +32,8 @@ def generate_LTS(target_directory, N, b_action, b_var, b_time, b_shared, b_depth
             file.write(generate_svl_ring("graph", N, "ACT_SHARED_{}_{}"))
         else:
             file.write(generate_svl("graph", N))
+
+    #now generate condition
+    condition_g = Condition_Generator(ap)
+    print(pretty_print(condition_g.get_boolean(100)))
 

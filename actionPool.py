@@ -2,7 +2,9 @@ import random
 
 from numpy import prod
 from numpy.random import binomial
-from random import   randint
+from random import   randint, getrandbits
+
+
 class ActionPool():
     def __init__(self, b_name, b_args, b_time, b_shared, b_shared_ratio =-1 ):
         # assume b_args is a list of natural numbers
@@ -15,6 +17,18 @@ class ActionPool():
             self.shared_ratio = self.b_shared / (self.ap_size + self.b_shared)
         else:
             self.shared_ratio = b_shared_ratio
+
+    def _choose_random_action(self):
+        return randint(0, self.b_name-1)
+
+
+    def sample_prohibition(self):
+        head_action_type = self._choose_random_action()
+        condition_action =[]
+        while bool(random.getrandbits(1)):
+            condition_action.append( self._choose_random_action())
+
+
 
     def shared_action(self):
         return binomial(1, self.shared_ratio)
@@ -59,9 +73,6 @@ class ActionPool():
                 return 1
             else:
                 return 0
-
-
-
 
 
     def _ring_label(self, graph, node, cur_depth, max_depth, forward_id, backward_id, forward_shared, backward_shared):
@@ -114,12 +125,17 @@ def prepare_ID( header, value):
     value = str(value)
     return "!IDS_OF ({}, {})".format( header, value)
 
-class Label():
+def define_and_increment(col, key):
+    res = col.get(key, 0)
+    col[key] = res + 1
 
+class Label():
+    labels = set()
     def __init__(self, name, args, time):
         self.name = name
         self.args = args
         self.time = time
+        Label.labels.add(self)
 
 
     def __repr__(self):
@@ -140,6 +156,8 @@ class Label():
     def __str__(self):
         return self.__repr__()
 
+    def __hash__(self):
+        return str(self).__hash__()
 
 class SharedLabel(Label):
 
@@ -150,3 +168,6 @@ class SharedLabel(Label):
 class ProcessWishSharedLabels(Label):
     def __init__(self, id, pa, pb):
         super().__init__("SHARED_{}_{}".format(pa, pb), [id], 0)
+
+
+
