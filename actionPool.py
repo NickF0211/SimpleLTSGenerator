@@ -31,7 +31,7 @@ class ActionPool():
             time = randint(0, self.b_time)
             if cur_shared < self.b_shared and  self.shared_action():
                 shared_id = cur_shared
-                out.add_label(SharedLabel(shared_id, time))
+                out.add_label(SharedLabel(shared_id))
                 new_shared = cur_shared + 1
             else:
                 out.add_label(Label(action_name, vars, time))
