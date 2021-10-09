@@ -27,7 +27,7 @@ def generate_LTS(target_directory, N, b_action, b_var, b_time, b_shared, b_depth
             file.write(graph.write_LTS())
     with open(os.path.join(os.getcwd(), target_directory, "demo.svl"), 'w') as file:
         if ring_sync:
-            file.write(generate_svl_ring("graph", N, "SHARED_ACTION_{}_{}"))
+            file.write(generate_svl_ring("graph", N, "ACT_SHARED_{}_{}"))
         else:
             file.write(generate_svl("graph", N))
 

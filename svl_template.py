@@ -35,21 +35,39 @@ def generate_svl_for_ring(graph_name, N, shared_action="ACT_SHARED_{}_{}"):
         return ""
     indent_token = "    "
     cur_body = generate_svl_for_pair(N-1, 0, form_body(graph_name, N-1), form_body(graph_name, 0), shared_action, indent=indent_token*N)
-    for i in range(N-1):
+    for i in range(N-2):
         next = i + 1
-        cur_body = generate_svl_for_pair(i, next, cur_body, form_body(graph_name, next), shared_action, indent= indent_token * (N-1-i))
+        if next == N-2:
+            cur_body = generate_svl_for_pair_special(i, next, cur_body, form_body(graph_name, next), "{},{}".format(shared_action.format(i, next),
+                                                                                                                    shared_action.format(next, next+1)),
+                                  indent=indent_token * (N - 1 - i))
+        else:
+            cur_body = generate_svl_for_pair(i, next, cur_body, form_body(graph_name, next), shared_action, indent= indent_token * (N-1-i))
 
     return cur_body
 
 def generate_svl_for_pair(pa, pb, pa_string, pb_string, shared_action="ACT_SHARED_{}_{}", indent=""):
     shared_action = shared_action.format(pa, pb)
     string= "{indent}par\n" \
-            "{indent}    {shared_action} -> \n" \
+            "{indent}   {shared_action} -> \n" \
             "{indent}{pa_string}\n" \
             "{indent}||\n" \
             "{indent}    {shared_action} -> \n" \
             "{indent}{pb_string}\n " \
-            "{indent}end par;".format(pa_string= pa_string, pb_string = pb_string, shared_action = shared_action.format(pa, pb),
+            "{indent}end par".format(pa_string= pa_string, pb_string = pb_string, shared_action = shared_action.format(pa, pb),
+                                      indent = indent)
+
+    return string
+
+def generate_svl_for_pair_special(pa, pb, pa_string, pb_string, shared_action, indent=""):
+    shared_action = shared_action.format(pa, pb)
+    string= "{indent}par\n" \
+            "{indent}   {shared_action} -> \n" \
+            "{indent}{pa_string}\n" \
+            "{indent}||\n" \
+            "{indent}    {shared_action} -> \n" \
+            "{indent}{pb_string}\n " \
+            "{indent}end par;".format(pa_string= pa_string, pb_string = pb_string, shared_action = shared_action,
                                       indent = indent)
 
     return string
