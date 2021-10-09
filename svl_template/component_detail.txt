@@ -1,0 +1,3 @@
+			-- graph 1 actions
+			{shared_action} ->
+				"{graph}_{id}.bcg"

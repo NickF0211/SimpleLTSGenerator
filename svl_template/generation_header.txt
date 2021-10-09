@@ -1,0 +1,1 @@
+% bcg_io {graph}_{id}.aut {graph}_{id}.bcg

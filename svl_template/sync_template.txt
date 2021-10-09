@@ -1,0 +1,8 @@
+-- generation of bcg
+{generation_script}
+
+"SCENARIO_$S.exp" = leaf divbranching reduction of
+{sync_script}
+
+"full_graph.bcg" = divbranching reduction of
+	generation of "SCENARIO_$S.exp";
