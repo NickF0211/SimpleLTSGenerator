@@ -21,21 +21,23 @@ class ActionPool():
     def label(self, graph):
         #DFS on the graph, assume time transition is monotonic
         bound = graph.depth
-        self._label(graph, graph.nodes[0],  0, bound)
+        self._label(graph, graph.nodes[0],  0, bound, 0)
 
-    def _label(self, graph, node,  cur_depth, max_depth):
+    def _label(self, graph, node,  cur_depth, max_depth, cur_shared = 0):
         assert(cur_depth <= max_depth)
         for out in node.out_going:
             action_name = randint(0, self.b_name)
             vars = [randint(0, b_var) for b_var in self.b_args]
             time = randint(0, self.b_time)
-            if self.shared_action():
-                shared_id = randint(0, self.b_shared)
+            if cur_shared < self.b_shared and  self.shared_action():
+                shared_id = cur_shared
                 out.add_label(SharedLabel(shared_id, time))
+                new_shared = cur_shared + 1
             else:
                 out.add_label(Label(action_name, vars, time))
+                new_shared = cur_shared
             dest_node = graph.get_node(out.dest)
-            self._label(graph, dest_node, cur_depth+1, max_depth)
+            self._label(graph, dest_node, cur_depth+1, max_depth, new_shared)
 
 def prepare_ID( header, value):
     value = str(value)
@@ -52,8 +54,8 @@ class Label():
     def __repr__(self):
         action_head = prepare_ID("ACTION", "ACT_{}".format(self.name))
         action_time = prepare_ID("TIME", self.time)
-        return "\"{} {} {}\"".\
-            format(action_head,
+        return "\"{} {} {} {}\"".\
+            format("ACT_{}".format(self.name), action_head,
                    ' '.join([prepare_ID("VAR_{}".format(i), self.args[i] ) for i in range(len(self.args))]),
                    action_time)
 
