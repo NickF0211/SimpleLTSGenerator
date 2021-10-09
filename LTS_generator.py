@@ -1,5 +1,6 @@
 from actionPool import *
 from graph import *
+from svl_template import generate_svl
 import os
 
 def generate_single_LTS(target_name, b_action, b_var, b_time, b_shared, b_depth, b_shared_ratio = -1):
@@ -21,4 +22,6 @@ def generate_LTS(target_directory, N, b_action, b_var, b_time, b_shared, b_depth
         ap.label(graph)
         with open(target_file, 'w') as file:
             file.write(graph.write_LTS())
+    with open(os.path.join(os.getcwd(), target_directory, "demo.svl"), 'w') as file:
+        file.write(generate_svl("graph", N))
 
