@@ -20,27 +20,97 @@ def pretty_print( expr):
 
 
 
-class Condition_Generator():
-    def __init__(self, ap):
+class SequenceConstraintGenerator():
+    def __init__(self, ap, scope = None):
+        self.ap = ap
+        self.scope = scope
+
+    def set_scope(self, scope):
+        assert(scope != [])
+        self.scope = scope
+
+    def pretty_print_action(self, action_num, action_class, exist):
+        if exist:
+            return 'act_{}:ACT_{}'.format(action_num, action_class)
+        else:
+            return '(* \ act_{}:ACT_{})'.format(action_num, action_class)
+
+    def pretty_print(self,  details):
+        return ' , '.join([self.pretty_print_action(action_num, action_class, exist)
+                           for action_num, action_class, exist in details])
+
+    def generate_order(self, head, condition_act):
+        condition_sequence =condition_act[:]
+        random.shuffle(condition_sequence)
+        existence = []
+        non_existence = []
+
+        for i in range(len(condition_sequence)):
+            if bool(random.getrandbits(1)):
+                existence.append(i)
+            else:
+                non_existence.append(i)
+        result = []
+        for i in existence:
+            result.append( (i, condition_sequence[i], True ))
+
+        for i in non_existence:
+            result.append((i, condition_sequence[i], False))
+
+        condition_sequence.append(head)
+        result.append((len(condition_sequence)-1, head, True))
+
+        return condition_sequence, result
+
+
+    def get_time_constraint(self, sequence, difference_ub):
+        #choose the first action (ealier)
+        act1 = random.randint(0, len(sequence)-2)
+        #choose the second action (later)
+        act2 = random.randint(act1+1, len(sequence)-1)
+
+        difference = random.randint(0, difference_ub)
+        random_op = random.choice(["<", ">"])
+        #if within the range
+        return [random_op, ["+", "act_{}.time".format(act1), str(difference)],"act_{}.time".format(act2)]
+
+
+
+
+
+
+
+class DataArgCondition_Generator():
+    def __init__(self, ap, scope=None):
         self.ap = ap
         self.numerical_function = [self.ADD, self.Minus]
         self.boolean_function = [self.NOT, self.AND, self.OR, self.EQ, self.GT, self.LE, self.GE, self.LT]
+        self.scope = scope
 
-    def get_numerical(self, depth=0):
+    def set_scope(self, scope):
+        assert(scope != [])
+        self.scope = scope
+
+    def get_numerical(self, depth=0, constant_allow = True):
         if depth == 0:
             arg_num = random.randint(0 , len(self.ap.b_args) -1)
             arg_bound = self.ap.b_args[arg_num]
-            if bool(random.getrandbits(1)):
+            if constant_allow and bool(random.getrandbits(1)):
                 return str(random.randint(0, arg_bound))
             else:
-                return "VAR_{}".format(arg_num)
+                if self.scope is None or self.scope == []:
+                    return "ARG_{}".format(arg_num)
+                else:
+                    action = random.choice(self.scope)
+                    return "act_{}.ARG_{}".format(action, arg_num)
         else:
             f = random.choice(self.numerical_function)
             return f(depth)
 
     def get_boolean(self, depth=0):
          if depth == 0:
-             return random.choice(["TRUE", "FALSE"])
+             f = random.choice(self.boolean_function)
+             return f(1)
          else:
              f = random.choice(self.boolean_function)
              return f(depth)
@@ -57,36 +127,40 @@ class Condition_Generator():
         assert (depth > 0)
         return ["OR", self.get_boolean(random.randint(0, depth - 1)), self.get_boolean(random.randint(0, depth - 1))]
 
-    def get_binary_numerical(self, boolean_op, depth):
-        return [boolean_op, self.get_numerical(random.randint(0, depth - 1)), self.get_numerical(random.randint(0, depth - 1))]
+    def get_binary_numerical(self, boolean_op, depth, constant_allow = True):
+        if depth == 1 and not constant_allow:
+            return [boolean_op, self.get_numerical(random.randint(0, depth - 1)),
+                    self.get_numerical(random.randint(0, depth - 1) ,constant_allow=False)]
+        else:
+            return [boolean_op, self.get_numerical(random.randint(0, depth - 1)), self.get_numerical(random.randint(0, depth - 1))]
 
     def EQ(self, depth):
         assert (depth > 0)
-        return self.get_binary_numerical("==", depth)
+        return self.get_binary_numerical("==", depth, constant_allow=False)
 
     def GT(self, depth):
         assert (depth > 0)
-        return self.get_binary_numerical(">", depth)
+        return self.get_binary_numerical(">", depth, constant_allow = False)
 
     def LT(self, depth):
         assert (depth > 0)
-        return self.get_binary_numerical("<", depth)
+        return self.get_binary_numerical("<", depth, constant_allow = False)
 
     def GE(self, depth):
         assert (depth > 0)
-        return self.get_binary_numerical(">=", depth)
+        return self.get_binary_numerical(">=", depth, constant_allow = False)
 
     def LE(self, depth):
         assert (depth > 0)
-        return self.get_binary_numerical("<=", depth)
+        return self.get_binary_numerical("<=", depth, constant_allow = False)
 
     def ADD(self, depth):
         assert (depth > 0)
-        return self.get_binary_numerical("+", depth)
+        return self.get_binary_numerical("+", depth, constant_allow = False)
 
     def Minus(self, depth):
         assert (depth > 0)
-        return self.get_binary_numerical("-", depth)
+        return self.get_binary_numerical("-", depth, constant_allow = False)
 
 
 

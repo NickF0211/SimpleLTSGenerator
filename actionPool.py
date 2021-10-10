@@ -3,6 +3,7 @@ import random
 from numpy import prod
 from numpy.random import binomial
 from random import   randint, getrandbits
+from condition_grammar import DataArgCondition_Generator, SequenceConstraintGenerator, pretty_print
 
 
 class ActionPool():
@@ -17,6 +18,42 @@ class ActionPool():
             self.shared_ratio = self.b_shared / (self.ap_size + self.b_shared)
         else:
             self.shared_ratio = b_shared_ratio
+
+        self.DG = DataArgCondition_Generator(self)
+        self.SG = SequenceConstraintGenerator(self)
+
+    def _sample_condition_actions(self, min_length=1):
+        condition_act =[]
+        while min_length > 0 or bool(getrandbits(1)):
+            condition_act.append(self._choose_random_action())
+            min_length -= 1
+
+        return condition_act
+
+    def generate_random_constraints(self, is_time = True, is_data=True):
+        head_action = self._choose_random_action()
+        condition_actions = self._sample_condition_actions(1)
+        depth = random.randint(1, 10)
+        sequence, detail = self.random_sequence_constraint(head_action, condition_actions)
+        sequence_constraint = self.SG.pretty_print(detail)
+        time, data = "", ""
+
+        if is_time:
+            time = self.SG.get_time_constraint(sequence, 10)
+
+        if is_data:
+            data = self.random_data_constraints(sequence[-1], sequence[:-1], depth)
+
+        return sequence_constraint, time, data
+
+
+    def random_data_constraints(self, head_act, cond_acts, depth):
+        self.DG.set_scope([head_act] + cond_acts)
+        return self.DG.get_boolean(depth)
+
+    def random_sequence_constraint(self, head_act, cond_acts):
+        return self.SG.generate_order(head_act, cond_acts)
+
 
     def _choose_random_action(self):
         return randint(0, self.b_name-1)
