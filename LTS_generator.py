@@ -36,7 +36,7 @@ def generate_LTS(target_directory, N, b_action, b_var, b_time, b_shared, b_depth
     with open(os.path.join(os.getcwd(), target_directory, "property.pl"), 'w') as file:
         for i in range(10):
             file.write("property_{}:\n".format(i))
-            sequence, time, data = ap.generate_random_constraints()
+            sequence, time, data = ap.generate_random_constraints(is_time=False)
             #now generate condition
 
             file.write("SEQ {} \n".format(pretty_print(sequence)))

@@ -91,12 +91,12 @@ class DataArgCondition_Generator():
         assert(scope != [])
         self.scope = scope
 
-    def get_numerical(self, depth=0, constant_allow = True):
+    def get_numerical(self, depth=0, constant_allow = False):
         if depth == 0:
             arg_num = random.randint(0 , len(self.ap.b_args) -1)
-            arg_bound = self.ap.b_args[arg_num]
+            #arg_bound = self.ap.b_args[arg_num]
             if constant_allow and bool(random.getrandbits(1)):
-                return str(random.randint(0, arg_bound))
+                return random.choice(["LB", "UP"])
             else:
                 if self.scope is None or self.scope == []:
                     return "ARG_{}".format(arg_num)
@@ -104,8 +104,9 @@ class DataArgCondition_Generator():
                     action = random.choice(self.scope)
                     return "act_{}.ARG_{}".format(action, arg_num)
         else:
-            f = random.choice(self.numerical_function)
-            return f(depth)
+            return self.get_numerical(depth=0, constant_allow = constant_allow)
+            #f = random.choice(self.numerical_function)
+            #return f(depth)
 
     def get_boolean(self, depth=0):
          if depth == 0:
@@ -135,6 +136,10 @@ class DataArgCondition_Generator():
             return [boolean_op, self.get_numerical(random.randint(0, depth - 1)), self.get_numerical(random.randint(0, depth - 1))]
 
     def EQ(self, depth):
+        assert (depth > 0)
+        return self.get_binary_numerical("==", depth, constant_allow=False)
+
+    def NEQ(self, depth):
         assert (depth > 0)
         return self.get_binary_numerical("==", depth, constant_allow=False)
 
