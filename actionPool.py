@@ -177,13 +177,19 @@ class Label():
         Label.labels.add(self)
 
 
-    def __repr__(self):
+    def IDSrepr__(self):
         action_head = prepare_ID("ACTION", "ACT_{}".format(self.name))
         action_time = prepare_ID("TIME", self.time)
         return "\"{} {} {} {}\"".\
             format("ACT_{}".format(self.name), action_head,
                    ' '.join([prepare_ID("VAR_{}".format(i), self.args[i] ) for i in range(len(self.args))]),
                    action_time)
+
+    def __repr__(self):
+        return "ACT_{} {} !{}".\
+            format(str(self.name),
+                   ' '.join(["!{}".format(str(self.args[i])) for i in range(len(self.args))]),
+                   self.time)
 
     def actinorepr(self):
         return "\"ACT_{}\" {} time! {}".\
