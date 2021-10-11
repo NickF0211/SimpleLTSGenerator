@@ -186,7 +186,7 @@ class Label():
                    action_time)
 
     def __repr__(self):
-        return "ACT_{} {} !{}".\
+        return "\"ACT_{} {} !{}\"".\
             format(str(self.name),
                    ' '.join(["!{}".format(str(self.args[i])) for i in range(len(self.args))]),
                    self.time)
