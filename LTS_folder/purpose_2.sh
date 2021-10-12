@@ -30,9 +30,9 @@ sed -i '1s/^/input\n/' label.io
 
 echo
 echo "generate purpose.bcg"
-lnt.open {purpose}.lnt generator -rename tgv.rename {purpose}.bcg
+lnt.open purpose_2.lnt generator -rename tgv.rename purpose_2.bcg
 
 
 #echo
 #echo "compute complete test graph"
-bcg_open full_graph.bcg $TESTOR_DIR/bin.$ARCH/testor.a -total -io label.io {purpose}.bcg tc.bcg
+bcg_open full_graph.bcg $TESTOR_DIR/bin.$ARCH/testor.a -total -io label.io purpose_2.bcg tc.bcg

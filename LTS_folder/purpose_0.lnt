@@ -1,0 +1,34 @@
+module purpose_0 is
+
+process MAIN [ACT_0, ACT_1, TESTOR_REFUSE, TESTOR_ACCEPT: any] is
+	var arg_0_0, arg_0_1, arg_0_2, arg_1_0, arg_1_1, arg_1_2, arg_2_0, arg_2_1, arg_2_2, t_0, t_1, t_2: Nat in
+
+		arg_0_0:= any NAT where (arg_0_0 < 5);
+		arg_0_1:= any NAT where (arg_0_1 < 5);
+		arg_0_2:= any NAT where (arg_0_2 < 5);
+		t_0 := any Nat where (t_0 < 1);
+		select
+			ACT_1 (arg_0_0, arg_0_1, arg_0_2);
+			TESTOR_REFUSE
+		[]
+			arg_1_0:= any NAT where (arg_1_0 < 5);
+			arg_1_1:= any NAT where (arg_1_1 < 5) and (((arg_1_1) > (arg_1_2)) AND ((arg_0_0) <= (arg_1_2)));
+			arg_1_2:= any NAT where (arg_1_2 < 5) and ((arg_0_0) <= (arg_1_2)) and (((arg_1_1) > (arg_1_2)) AND ((arg_0_0) <= (arg_1_2))) and (((arg_1_1) > (arg_1_2)) AND ((arg_0_0) <= (arg_1_2))) and ((arg_1_1) > (arg_1_2)) and (((arg_1_1) > (arg_1_2)) AND ((arg_0_0) <= (arg_1_2)));
+			t_1 := any Nat where (t_1 < 1);
+			select
+				ACT_0 (arg_1_0, arg_1_1, arg_1_2);
+				TESTOR_REFUSE
+			[]
+				arg_2_0:= any NAT where (arg_2_0 < 5);
+				arg_2_1:= any NAT where (arg_2_1 < 5);
+				arg_2_2:= any NAT where (arg_2_2 < 5);
+				t_2 := any Nat where (t_2 < 1);
+				ACT_1 (arg_2_0, arg_2_1, arg_2_2);
+				TESTOR_ACCEPT
+			end select
+		end select
+
+	end var
+end process
+
+end module

@@ -83,17 +83,21 @@ def create_lnt_file(sequence, data_constraint, ap, module_name = "purpose"):
     variables = []
     time_variables = ["t_{}".format(i) for i in range(len(sequence))]
     variable_condition = dict()
-    action_classes = []
+    action_classes = set()
     # now we have sorted data with dependicies
+    refuse = ""
     for action_num, action_class, exist in sequence:
-        action_classes.append("ACT_{}".format(action_class))
+        if not exist:
+            refuse = "TESTOR_REFUSE,"
+
+        action_classes.add("ACT_{}".format(action_class))
         for i in range(len(ap.b_args)):
             var_name = form_arg_name(action_num, i)
             variables.append(form_arg_name(action_num, i))
             var_dep = fetch_dependicy(dep, var_name)
             bound = ap.b_args[i]
             var_dep_string = ' and '.join(["({} < {})".format(var_name, bound)]+['({})'.format(content) for content in var_dep])
-            variables.append(var_name)
+            #variables.append(var_name)
             var_declar_string = "{var_name}:= any NAT where {follow};".format(var_name=var_name,
                                                                                                   follow = var_dep_string)
             variable_condition[var_name] = var_declar_string
@@ -105,7 +109,7 @@ def create_lnt_file(sequence, data_constraint, ap, module_name = "purpose"):
 
     with open(os.path.join(os.getcwd(), "LTS_folder", "{}.lnt".format(module_name)), 'w') as outfile:
         outfile.write(LNT_template.format(decl=decl, arg_var = variables, module_name = module_name,
-                                          time_var = time_variables, action_class =action_classes))
+                                          time_var = time_variables, action_class =action_classes, TESTOR_REFUSE = refuse))
 
     with open(os.path.join(os.getcwd(), "LTS_folder", "{}.sh".format(module_name)), 'w') as outfile:
         outfile.write(DEMOSHELL_template.replace("{purpose}", module_name))
