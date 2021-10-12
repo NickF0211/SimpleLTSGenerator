@@ -42,12 +42,10 @@ class SequenceConstraintGenerator():
     def generate_order(self, head, min_step = 1):
         condition_sequence =[]
         random.shuffle(condition_sequence)
-        existence = []
-        non_existence = []
         contex = set()
         cur_step = 0
         result = []
-        while cur_step < min_step or bool(random.getrandbits(1)):
+        while cur_step < min_step or bool(random.getrandbits(1)) or head in contex:
             exist = ( bool(random.getrandbits(1)) or len(contex) == self.ap.b_name -1)
             if exist:
                 action_class = self.ap._choose_random_action(contex)

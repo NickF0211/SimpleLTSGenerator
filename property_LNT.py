@@ -7,6 +7,7 @@ with open(os.path.join(os.getcwd(), "LNT_template", "LNT_template.lnt"), 'r') as
 with open(os.path.join(os.getcwd(), "LNT_template", "demo.sh"), 'r') as file :
     DEMOSHELL_template = file.read()
 
+VAR_DECL_template = "var {arg_var}: Nat in"
 
 def get_action_and_index(arg_name):
     args = arg_name.spilit('_')
@@ -46,6 +47,7 @@ def create_action_declartion(dep, action_num, ap, variable_condition):
     return lines
 
 def form_string(sequence, variable_condition, ap, dep, cur_indent = 0):
+    global VAR_DECL_template
     indent = "	"
     if sequence == []:
         return indent * cur_indent + "TESTOR_ACCEPT"
@@ -54,17 +56,22 @@ def form_string(sequence, variable_condition, ap, dep, cur_indent = 0):
 
         argument_decl = create_action_declartion(dep, action_num, ap, variable_condition)
         #argument_decl.append("t_{i} := any Nat where (t_{i} < {t_bound});".format(i=action_num, t_bound=ap.b_time))
-        action_occurance = "ACT_{} ({});".format(action_class, ', '.join(
-            [form_arg_name(action_num, i) for i in range(len(ap.b_args))]))
-
+        argument_variables = ', '.join(
+            [form_arg_name(action_num, i) for i in range(len(ap.b_args))])
+        action_occurance = "ACT_{} ({});".format(action_class, argument_variables)
+        old_indent = cur_indent
+        cur_indent = cur_indent + 1
 
         if exist:
-            argument_decl.append(action_occurance)
+            argument_decl = [indent * old_indent + VAR_DECL_template.format(arg_var=argument_variables)] + \
+                            [indent * cur_indent + line for line in argument_decl]
             cont = form_string(sequence[1:], variable_condition, ap, dep, cur_indent = cur_indent)
-            return "{cur}\n{next}".format(cur = '\n'.join([indent * cur_indent +  line for line in argument_decl]),
-                                          next = cont)
+            argument_decl.append(cont)
+            argument_decl.append(indent * old_indent + "end var")
+            return '\n'.join(argument_decl)
         else:
-            argument_decl = [indent * cur_indent + line for line in argument_decl]
+            argument_decl = [indent * old_indent + VAR_DECL_template.format(arg_var = argument_variables)] +\
+                            [indent * cur_indent + line for line in argument_decl]
             argument_decl.append(indent * cur_indent  + "select")
             argument_decl.append(indent * (cur_indent + 1) + action_occurance)
             argument_decl.append(indent * (cur_indent + 1) + "TESTOR_REFUSE")
@@ -72,6 +79,7 @@ def form_string(sequence, variable_condition, ap, dep, cur_indent = 0):
             cont = form_string(sequence[1:], variable_condition, ap, dep,  cur_indent = cur_indent+1)
             argument_decl.append(cont)
             argument_decl.append(indent * cur_indent + "end select")
+            argument_decl.append(indent * old_indent + "end var")
             return '\n'.join(argument_decl)
 
 
