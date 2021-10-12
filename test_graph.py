@@ -1,4 +1,4 @@
-from LTS_generator import generate_LTS
+from LTS_generator import generate_LTS, run_experiment
 import os.path
 if __name__ == "__main__":
     #file name, #num of action, #argument bound, #time progression bound, #shared action bound #LTS math depth, #shared ratio
@@ -10,7 +10,7 @@ if __name__ == "__main__":
     '''
     #generate_LTS(target_directory, N, b_action, b_var, b_time, b_shared, b_depth, b_shared_ratio = -1):
     generate_LTS(result_dir, 3, 2, [5,5,5], 1, 2, 10, b_shared_ratio = 0.1, ring_sync=False)
-
+    run_experiment(result_dir)
     #generate_LTS(result_dir, 3, 2, [5, 5], 1, 2, 10, b_shared_ratio=0.1, ring_sync=False)
 
 

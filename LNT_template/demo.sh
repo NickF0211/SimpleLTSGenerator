@@ -35,4 +35,9 @@ lnt.open {purpose}.lnt generator -rename tgv.rename {purpose}.bcg
 
 #echo
 #echo "compute complete test graph"
-bcg_open full_graph.bcg $TESTOR_DIR/bin.$ARCH/testor.a -total -io label.io {purpose}.bcg tc.bcg
+bcg_open full_graph.bcg $TESTOR_DIR/bin.$ARCH/testor.a -total -io label.io {purpose}.bcg tc_{purpose}.bcg
+
+
+echo
+echo "Is it feasible, if yes size > 1"
+bcg_info tc_{purpose}.bcg | grep transitions
