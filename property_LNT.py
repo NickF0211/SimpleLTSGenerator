@@ -65,6 +65,7 @@ def form_string(sequence, variable_condition, ap, dep, cur_indent = 0):
         if exist:
             argument_decl = [indent * old_indent + VAR_DECL_template.format(arg_var=argument_variables)] + \
                             [indent * cur_indent + line for line in argument_decl]
+            argument_decl.append(indent * cur_indent  + action_occurance)
             cont = form_string(sequence[1:], variable_condition, ap, dep, cur_indent = cur_indent)
             argument_decl.append(cont)
             argument_decl.append(indent * old_indent + "end var")
