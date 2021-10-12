@@ -8,9 +8,9 @@ import subprocess
 
 
 
-PropertyNUM = 10
 
-def generate_single_LTS(target_name, b_action, b_var, b_time, b_shared, b_depth, b_shared_ratio = -1):
+
+def generate_single_LTS(target_name, b_action, b_var, b_time, b_shared, b_depth, b_shared_ratio = -1 ):
     ap = ActionPool(b_action, b_var, b_time, b_shared, b_shared_ratio= b_shared_ratio)
     graph = Graph(b_depth, ap.ap_size)
     graph.generate()
@@ -18,8 +18,8 @@ def generate_single_LTS(target_name, b_action, b_var, b_time, b_shared, b_depth,
     with open(target_name, 'w') as file:
         file.write(graph.write_LTS())
 
-def generate_LTS(target_directory, N, b_action, b_var, b_time, b_shared, b_depth, b_shared_ratio = -1 , ring_sync = False):
-    global PropertyNUM
+def generate_LTS(target_directory, N, b_action, b_var, b_time, b_shared, b_depth, b_shared_ratio = -1 , ring_sync = False, property_num = 10):
+
     if not os.path.isdir(target_directory):
         os.mkdir(target_directory)
     ap = ActionPool(b_action, b_var, b_time, b_shared, b_shared_ratio= b_shared_ratio)
@@ -41,7 +41,7 @@ def generate_LTS(target_directory, N, b_action, b_var, b_time, b_shared, b_depth
             file.write(generate_svl("graph", N))
 
     with open(os.path.join(os.getcwd(), target_directory, "property.pl"), 'w') as file:
-        for i in range(PropertyNUM):
+        for i in range(property_num):
             file.write("property_{}:\n".format(i))
             sequence, time, data = ap.generate_random_constraints(is_time=False)
 
@@ -58,13 +58,3 @@ def generate_LTS(target_directory, N, b_action, b_var, b_time, b_shared, b_depth
             file.write('\n')
 
 
-def run_experiment(target_directory):
-    global PropertyNUM
-    # change the current working directory
-    target_directory = os.path.join(os.getcwd(), target_directory)
-    os.chdir(target_directory)
-    for i in range(PropertyNUM):
-        target_file = os.path.join(os.getcwd(), target_directory, "purpose_{}.sh".format(i))
-        os.system("chmod u+x {file}".format(file = target_file ))
-        os.system("{file}".format(file=target_file))
-        print("-----------------------------------------------------------------")
