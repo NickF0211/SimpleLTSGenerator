@@ -33,9 +33,8 @@ class ActionPool():
 
     def generate_random_constraints(self, is_time = True, is_data=True):
         head_action = self._choose_random_action()
-        condition_actions = self._sample_condition_actions(1)
         depth = random.randint(1, 10)
-        sequence, detail = self.random_sequence_constraint(head_action, condition_actions)
+        sequence, detail = self.random_sequence_constraint(head_action)
         time, data = "", ""
 
         if is_time:
@@ -51,12 +50,16 @@ class ActionPool():
         self.DG.set_scope([head_act] + cond_acts)
         return self.DG.get_boolean(depth)
 
-    def random_sequence_constraint(self, head_act, cond_acts):
-        return self.SG.generate_order(head_act, cond_acts)
+    def random_sequence_constraint(self, head_act):
+        return self.SG.generate_order(head_act)
 
 
-    def _choose_random_action(self):
-        return randint(0, self.b_name-1)
+    def _choose_random_action(self, exceptions=None):
+        if exceptions ==None:
+            return randint(0, self.b_name-1)
+        else:
+            available = [i for i in range(self.b_name) if i not in exceptions]
+            return random.choice(available)
 
 
     def sample_prohibition(self):
@@ -186,10 +189,9 @@ class Label():
                    action_time)
 
     def __repr__(self):
-        return "\"ACT_{} {} !{}\"".\
+        return "\"ACT_{} {}\"".\
             format(str(self.name),
-                   ' '.join(["!{}".format(str(self.args[i])) for i in range(len(self.args))]),
-                   self.time)
+                   ' '.join(["!{}".format(str(self.args[i])) for i in range(len(self.args))]))
 
     def actinorepr(self):
         return "\"ACT_{}\" {} time! {}".\

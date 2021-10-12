@@ -39,26 +39,30 @@ class SequenceConstraintGenerator():
         return ' , '.join([self.pretty_print_action(action_num, action_class, exist)
                            for action_num, action_class, exist in details])
 
-    def generate_order(self, head, condition_act):
-        condition_sequence =condition_act[:]
+    def generate_order(self, head, min_step = 1):
+        condition_sequence =[]
         random.shuffle(condition_sequence)
         existence = []
         non_existence = []
-
-        for i in range(len(condition_sequence)):
-            if bool(random.getrandbits(1)):
-                existence.append(i)
-            else:
-                non_existence.append(i)
+        contex = set()
+        cur_step = 0
         result = []
-        for i in existence:
-            result.append( (i, condition_sequence[i], True ))
+        while cur_step < min_step or bool(random.getrandbits(1)):
+            exist = ( bool(random.getrandbits(1)) or len(contex) == self.ap.b_name -1)
+            if exist:
+                action_class = self.ap._choose_random_action(contex)
+                condition_sequence.append(action_class)
+                contex.clear()
+                result.append((cur_step, action_class, True))
+                cur_step += 1
+            else:
+                action_class = self.ap._choose_random_action(contex)
+                contex.add(action_class)
+                condition_sequence.append(action_class)
+                result.append((cur_step, action_class, False))
+                cur_step += 1
 
-        for i in non_existence:
-            result.append((i, condition_sequence[i], False))
-
-        condition_sequence.append(head)
-        result.append((len(condition_sequence)-1, head, True))
+        result.append((len(condition_sequence), head, True))
 
         return condition_sequence, result
 

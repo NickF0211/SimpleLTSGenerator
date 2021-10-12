@@ -22,7 +22,8 @@ def fetch_dependicy(dep, var1):
     res = dep.get(var1, None)
     collection = []
     if res is not None:
-        for _, value in res.items():
+        for key, value in res.items():
+            assert(var1 >= key)
             collection += value
         return collection
     else:
