@@ -39,7 +39,7 @@ def generate_LTS(target_directory, N, b_action, b_var, b_time, b_shared, b_depth
             file.write("property_{}:\n".format(i))
             sequence, time, data = ap.generate_random_constraints(is_time=False)
 
-            create_lnt_file(sequence, data, ap)
+            create_lnt_file(sequence, data, ap, "purpose_{}".format(i))
 
 
 

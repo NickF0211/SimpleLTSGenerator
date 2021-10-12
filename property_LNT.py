@@ -1,4 +1,8 @@
 from CEXGen.s_expr_converter import variable_parser
+import os
+
+with open(os.path.join(os.getcwd(), "LNT_template", "LNT_template.lnt"), 'r') as file :
+    LNT_template = file.read()
 
 
 def get_action_and_index(arg_name):
@@ -37,17 +41,49 @@ def create_action_declartion(dep, action_num, ap, variable_condition):
 
     return lines
 
+def form_string(sequence, variable_condition, ap, dep, cur_indent = 0):
+    indent = "	"
+    if sequence == []:
+        return indent * cur_indent + "TESTOR_ACCEPT"
+    else:
+        action_num, action_class,  exist = sequence[0]
+
+        argument_decl = create_action_declartion(dep, action_num, ap, variable_condition)
+        argument_decl.append("t_{i} := any Nat where (t_{i} < {t_bound});".format(i=action_num, t_bound=ap.b_time))
+        action_occurance = "ACT_{} ({});".format(action_class, ', '.join(
+            [form_arg_name(action_num, i) for i in range(len(ap.b_args))]))
 
 
-def create_lnt_file(sequence, data_constraint, ap):
+        if exist:
+            argument_decl.append(action_occurance)
+            cont = form_string(sequence[1:], variable_condition, ap, dep, cur_indent = cur_indent)
+            return "{cur}\n{next}".format(cur = '\n'.join([indent * cur_indent +  line for line in argument_decl]),
+                                          next = cont)
+        else:
+            argument_decl = [indent * cur_indent + line for line in argument_decl]
+            argument_decl.append(indent * cur_indent  + "select")
+            argument_decl.append(indent * (cur_indent + 1) + action_occurance)
+            argument_decl.append(indent * (cur_indent + 1) + "TESTOR_REFUSE")
+            argument_decl.append(indent * cur_indent + "[]")
+            cont = form_string(sequence[1:], variable_condition, ap, dep,  cur_indent = cur_indent+1)
+            argument_decl.append(cont)
+            argument_decl.append(indent * cur_indent + "end select")
+            return '\n'.join(argument_decl)
+
+
+
+
+def create_lnt_file(sequence, data_constraint, ap, module_name = "purpose"):
+    global LNT_template
     vars, dep = variable_parser(data_constraint)
-    sorted_var = sorted(list(vars))
 
     variables = []
+    time_variables = ["t_{}".format(i) for i in range(len(sequence))]
     variable_condition = dict()
+    action_classes = []
     # now we have sorted data with dependicies
-    cur_exists = True
     for action_num, action_class, exist in sequence:
+        action_classes.append("ACT_{}".format(action_class))
         for i in range(len(ap.b_args)):
             var_name = form_arg_name(action_num, i)
             variables.append(form_arg_name(action_num, i))
@@ -59,9 +95,19 @@ def create_lnt_file(sequence, data_constraint, ap):
                                                                                                   follow = var_dep_string)
             variable_condition[var_name] = var_declar_string
 
-        argument_declar = create_action_declartion(dep, action_num, ap, variable_condition)
-        argument_declar.append("t_{i} := any Nat where (t_{i} < {t_bound});".format(i=action_num, t_bound=ap.b_time))
-        print('\n'.join(argument_declar))
+    decl = form_string(sequence, variable_condition, ap, dep, cur_indent = 2)
+    variables = ', '.join(variables)
+    time_variables = ', '.join(time_variables)
+    action_classes = ', '.join(action_classes)
+
+    with open(os.path.join(os.getcwd(), "LTS_folder", "{}.lnt".format(module_name)), 'w') as outfile:
+        outfile.write(LNT_template.format(decl=decl, arg_var = variables, module_name = module_name,
+                                          time_var = time_variables, action_class =action_classes))
+
+
+
+
+
 
 
 

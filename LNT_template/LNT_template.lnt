@@ -1,0 +1,11 @@
+module {module_name} is
+
+process MAIN [{action_class}, TESTOR_REFUSE, TESTOR_ACCEPT: any] is
+	var {arg_var}, {time_var}: Nat in:
+
+{decl}
+
+	end var
+end process
+
+end module

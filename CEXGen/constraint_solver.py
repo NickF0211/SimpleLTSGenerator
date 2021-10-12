@@ -1,6 +1,6 @@
-from logic_operator import *
-from domain import *
-from read_trace import translation_value_map
+from CEXGen.logic_operator import *
+from CEXGen.domain import *
+from CEXGen.read_trace import translation_value_map
 from pysmt.shortcuts import Solver
 
 

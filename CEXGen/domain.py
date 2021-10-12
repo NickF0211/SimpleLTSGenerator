@@ -1,4 +1,4 @@
-from type_constructor import create_type, create_action, create_pair_action
+from CEXGen.type_constructor import create_type, create_action, create_pair_action
 
 
 type_dict = dict()

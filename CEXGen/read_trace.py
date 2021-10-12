@@ -1,5 +1,5 @@
-from domain import *
-from logic_operator import model_action_mapping
+from CEXGen.domain import *
+from CEXGen.logic_operator import model_action_mapping
 from pysmt.shortcuts import *
 from ast import literal_eval as make_tuple
 
