@@ -60,6 +60,9 @@ def generate_LTS(target_directory, N, b_action, b_var, b_time, b_shared, b_depth
 
 def run_experiment(target_directory):
     global PropertyNUM
+    # change the current working directory
+    target_directory = os.path.join(os.getcwd(), target_directory)
+    os.chdir(target_directory)
     for i in range(PropertyNUM):
         target_file = os.path.join(os.getcwd(), target_directory, "purpose_{}.sh".format(i))
         os.system("chmod u+x {file}".format(file = target_file ))
