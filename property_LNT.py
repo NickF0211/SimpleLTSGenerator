@@ -4,6 +4,9 @@ import os
 with open(os.path.join(os.getcwd(), "LNT_template", "LNT_template.lnt"), 'r') as file :
     LNT_template = file.read()
 
+with open(os.path.join(os.getcwd(), "LNT_template", "demo.sh"), 'r') as file :
+    DEMOSHELL_template = file.read()
+
 
 def get_action_and_index(arg_name):
     args = arg_name.spilit('_')
@@ -104,6 +107,8 @@ def create_lnt_file(sequence, data_constraint, ap, module_name = "purpose"):
         outfile.write(LNT_template.format(decl=decl, arg_var = variables, module_name = module_name,
                                           time_var = time_variables, action_class =action_classes))
 
+    with open(os.path.join(os.getcwd(), "LTS_folder", "{}.sh".format(module_name)), 'w') as outfile:
+        outfile.write(DEMOSHELL_template.replace("{purpose}", module_name))
 
 
 
