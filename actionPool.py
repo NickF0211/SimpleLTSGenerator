@@ -6,6 +6,7 @@ from random import   randint, getrandbits
 from condition_grammar import DataArgCondition_Generator, SequenceConstraintGenerator, pretty_print
 
 
+
 class ActionPool():
     def __init__(self, b_name, b_args, b_time, b_shared, b_shared_ratio =-1 ):
         # assume b_args is a list of natural numbers
@@ -35,7 +36,6 @@ class ActionPool():
         condition_actions = self._sample_condition_actions(1)
         depth = random.randint(1, 10)
         sequence, detail = self.random_sequence_constraint(head_action, condition_actions)
-        sequence_constraint = self.SG.pretty_print(detail)
         time, data = "", ""
 
         if is_time:
@@ -44,7 +44,7 @@ class ActionPool():
         if is_data:
             data = self.random_data_constraints(sequence[-1], sequence[:-1], depth)
 
-        return sequence_constraint, time, data
+        return detail, time, data
 
 
     def random_data_constraints(self, head_act, cond_acts, depth):

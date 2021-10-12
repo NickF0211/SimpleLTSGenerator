@@ -76,15 +76,12 @@ class SequenceConstraintGenerator():
 
 
 
-
-
-
-
 class DataArgCondition_Generator():
     def __init__(self, ap, scope=None):
         self.ap = ap
         self.numerical_function = [self.ADD, self.Minus]
-        self.boolean_function = [self.NOT, self.AND, self.OR, self.EQ, self.GT, self.LE, self.GE, self.LT]
+        #self.boolean_function = [self.NOT, self.AND, self.OR, self.EQ, self.GT, self.LE, self.GE, self.LT, self.NEQ]
+        self.boolean_function = [self.AND, self.EQ, self.GT, self.LE, self.GE, self.LT, self.NEQ]
         self.scope = scope
 
     def set_scope(self, scope):
@@ -99,10 +96,10 @@ class DataArgCondition_Generator():
                 return random.choice(["LB", "UP"])
             else:
                 if self.scope is None or self.scope == []:
-                    return "ARG_{}".format(arg_num)
+                    return "arg_{}".format(arg_num)
                 else:
                     action = random.choice(self.scope)
-                    return "act_{}.ARG_{}".format(action, arg_num)
+                    return "arg_{}_{}".format(action, arg_num)
         else:
             return self.get_numerical(depth=0, constant_allow = constant_allow)
             #f = random.choice(self.numerical_function)

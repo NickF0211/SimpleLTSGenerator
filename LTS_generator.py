@@ -2,6 +2,7 @@ from actionPool import *
 from graph import *
 from svl_template import generate_svl, generate_svl_ring
 from condition_grammar import DataArgCondition_Generator, pretty_print
+from property_LNT import create_lnt_file
 import os
 
 def generate_single_LTS(target_name, b_action, b_var, b_time, b_shared, b_depth, b_shared_ratio = -1):
@@ -37,9 +38,15 @@ def generate_LTS(target_directory, N, b_action, b_var, b_time, b_shared, b_depth
         for i in range(10):
             file.write("property_{}:\n".format(i))
             sequence, time, data = ap.generate_random_constraints(is_time=False)
+
+            create_lnt_file(sequence, data, ap)
+
+
+
+
             #now generate condition
 
-            file.write("SEQ {} \n".format(pretty_print(sequence)))
+            file.write("SEQ {} \n".format(pretty_print(ap.SG.pretty_print(sequence))))
             file.write("TIME {} \n".format(pretty_print(time)))
             file.write("DATA {} \n".format(pretty_print(data)))
             file.write('\n')
